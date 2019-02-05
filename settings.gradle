@@ -1,0 +1,9 @@
+include 'text-adventure-jvm-terminal'
+include 'text-adventure-engine-common'
+include 'text-adventure-terminal'
+include 'text-adventure-native'
+include 'my-game-common'
+include 'my-game-jvm-terminal'
+//include 'my-game-native-terminal'
+
+rootProject.name = 'text-adventure'
