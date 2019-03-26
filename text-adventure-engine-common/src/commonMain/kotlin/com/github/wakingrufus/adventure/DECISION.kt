@@ -3,32 +3,30 @@ package com.github.wakingrufus.adventure
 @GameDsl
 class DECISION<T> {
     var prompt: String = ""
-    val choices: MutableList<CHOICE<T>> = mutableListOf()
+    val choices: MutableList<CHOICE<T>.() -> Unit> = mutableListOf()
 
-    fun choice(text: String, choice: CHOICE<T>.() -> Unit = {}) {
-        choices += CHOICE<T>(text).apply(choice)
+    fun choice(name: String, choice: CHOICE<T>.() -> Unit = {}) {
+        choices += {
+            this.description = name
+            this.apply(choice)
+        }
     }
 
-    fun decide(state: T,
-               input: () -> String?,
-               output: (String) -> Unit): T {
-        return decide(this, state, input, output)
+    operator fun invoke(): Decision<T> {
+        return Decision(
+                prompt = prompt,
+                choices = choices.map { CHOICE<T>().apply(it)() })
     }
 }
 
-fun <T> decide(decision: DECISION<T>,
-               state: T,
-               input: () -> String?,
-               output: (String) -> Unit = ::println): T {
-    var responseInt: Int
-    do {
-        output(decision.prompt)
-        decision.choices.map { it.compile() }.forEachIndexed { i, choiceText ->
-            output("${i + 1}) ${choiceText.description}")
+class Decision<T>(val prompt: String, val choices: List<Choice<T>>) {
+
+    fun selectChoice(choice: String): Choice<T>? {
+        val responseInt = choice.toIntOrNull() ?: 0
+        return if (responseInt > 0 && responseInt <= choices.size) {
+            choices[responseInt - 1]
+        } else {
+            null
         }
-        val response = input()
-        responseInt = response?.toIntOrNull() ?: 0
-    } while (responseInt < 1 || responseInt > decision.choices.size)
-    val choice = decision.choices[responseInt - 1]
-    return choose(choice.compile(), state, input, output)
+    }
 }

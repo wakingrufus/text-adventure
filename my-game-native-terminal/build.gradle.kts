@@ -1,27 +1,47 @@
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("native") version "1.3.11"
-  //  id("org.jetbrains.kotlin.native") version "1.3.11"
+    kotlin("multiplatform") version "1.3.21"
 }
+
 
 repositories {
     mavenCentral()
     jcenter()
 }
 
-dependencies {
-    implementation(project(":text-adventure-terminal"))
+kotlin {
+
+    linuxX64("linux") {
+        binaries {
+            executable (listOf(RELEASE))
+        }
+    }
+    sourceSets {
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test-common"))
+                implementation(kotlin("test-annotations-common"))
+            }
+        }
+        val linuxMain by getting {
+            dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-native:1.1.1")
+                implementation(project(":text-adventure-terminal"))
+                implementation(project(":text-adventure-engine-common"))
+                implementation(project(":my-game-common"))
+            }
+        }
+        val linuxTest by getting {
+            dependencies {
+            }
+        }
+    }
 }
-components["main"] {
-    targets = listOf("linux_x64")
-}
-sourceSets["main"].component {
-    target("linux_x64")
-}
-sourceSets["main"].apply {
-    if (this is KotlinNativeMainComponent) {
-        outputKinds.add(OutputKind.KLIBRARY)
-        outputKinds.add(OutputKind.EXECUTABLE)
+
+tasks.withType<KotlinCompile> {
+    kotlinOptions {
+        jvmTarget = "1.8"
+        freeCompilerArgs = listOf("-XXLanguage:+InlineClasses")
     }
 }

@@ -1,8 +1,9 @@
 package com.github.wakingrufus.adventure
 
 @GameDsl
-class CHOICE<T>(val description: String) {
-    private var decision: ((T) -> DECISION<T>)? = null
+class CHOICE<T> {
+    var description: String = ""
+    private var decision: ((T) -> DECISION<T>?) = { null }
     private var info: ((T) -> String)? = null
 
     fun decision(block: DECISION<T>.() -> Unit) {
@@ -17,31 +18,26 @@ class CHOICE<T>(val description: String) {
         info = text
     }
 
+    fun goto(gotoDecision: (T) -> DECISION<T>?) {
+        decision = gotoDecision
+    }
+
     private var stateChange: ((T) -> T) = { it }
     fun stateChange(delta: (T) -> T) {
         stateChange = delta
     }
 
-    fun choose(state: T, input: () -> String?, output: (String) -> Unit): T {
-        return choose(this.compile(), state, input, output)
-    }
-
-    fun compile(): Choice<T> {
-        return Choice(description = description, decision = decision, info = info, stateChange = stateChange)
-    }
-}
-
-data class Choice<T>(val description: String,
-                     val decision: ((T) -> DECISION<T>)?,
-                     val stateChange: ((T) -> T),
-                     val info: ((T) -> String)?)
-
-fun <T> choose(choice: Choice<T>, state: T, input: () -> String?, output: (String) -> Unit): T {
-    return choice.apply {
-        choice.info?.run {
-            output(this.invoke(state))
-        }
-    }.stateChange(state).let { s ->
-        choice.decision?.invoke(s)?.let { decide(it, s, input, output) } ?: s
+    operator fun invoke(): Choice<T> {
+        return Choice(
+                description = description,
+                decision = { state -> decision.invoke(state)?.invoke() },
+                info = info,
+                stateChange = stateChange)
     }
 }
+
+class Choice<T>(
+        val description: String,
+        val decision: (T) -> Decision<T>?,
+        val info: ((T) -> String)? = null,
+        val stateChange: ((T) -> T))

@@ -1,5 +1,6 @@
 package com.github.wakingrufus.adventure
 
+
 @DslMarker
 annotation class GameDsl
 

@@ -2,20 +2,15 @@ package com.github.wakingrufus.adventure
 
 @GameDsl
 class GAME<T> {
-    var mainDecision: DECISION<T>? = null
-    fun decision(decision: DECISION<T>.() -> Unit) {
-        mainDecision = DECISION<T>().apply(decision)
+    private var mainDecision: (DECISION<T>.() -> Unit) = {}
+
+    fun start(startingDecision: DECISION<T>.() -> Unit) {
+        mainDecision = startingDecision
     }
 
-    fun play(state: T, input: () -> String?,
-             output: (String) -> Unit = ::println): T {
-        return play(this, state, input, output)
+    operator fun invoke(): Game<T> {
+        return Game(DECISION<T>().apply(mainDecision)())
     }
 }
 
-fun <T> play(game: GAME<T>,
-             state: T,
-             input: () -> String?,
-             output: (String) -> Unit): T {
-    return game.mainDecision?.let { decide(it, state, input, output) } ?: state
-}
+class Game<T>(val mainDecision: Decision<T>)

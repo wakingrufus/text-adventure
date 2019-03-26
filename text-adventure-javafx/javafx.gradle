@@ -1,13 +1,4 @@
-buildscript {
-    dependencies {
-        classpath group: 'de.dynamicfiles.projects.gradle.plugins', name: 'javafx-gradle-plugin', version: '8.8.2'
-    }
-    repositories {
-        mavenCentral()
-    }
-}
 
-apply plugin: 'javafx-gradle-plugin'
 
 repositories {
     mavenCentral()
@@ -41,24 +32,4 @@ dependencies {
 
     // uncomment for headless test
     // testCompile 'org.testfx:openjfx-monocle:8u76-b04'
-}
-
-jfx {
-    // minimal requirement for jfxJar-task
-    mainClassName = 'com.grubhub.MainKt'
-    mainClass = 'com.grubhub.MainKt'
-    appName = "gargui"
-    // minimal requirement for jfxNative-task
-    vendor = 'grubhub'
-    bundler = "deb"
-    nativeReleaseVersion = project.version
-    verbose = true
-}
-
-build.dependsOn jfxNative
-
-
-test {
-    // uncomment below line for headless test
-    //  jvmArgs "-Djava.awt.headless=true", "-Dtestfx.headless=true", "-Dheadless=true", "-Dtestfx.robot=glass", "-Dglass.platform=Monocle", "-Dmonocle.platform=Headless", "-Dprism.order=sw", "-Dprism.text=t2k", "-Dtestfx.setup.timeout=2500"
 }

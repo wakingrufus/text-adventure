@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     idea
-    kotlin("jvm") version "1.3.20"
+    kotlin("jvm") version "1.3.21"
     jacoco
     application
 }
@@ -22,10 +22,10 @@ group = "com.github.wakingrufus"
 
 dependencies {
     implementation(kotlin("stdlib"))
-    implementation(project(":text-adventure-terminal"))
-    implementation(project(":text-adventure-engine-common"))
-    implementation(project(":my-game-common"))
-    implementation("io.github.microutils:kotlin-logging:1.6.10")
+    implementation(project(":text-adventure-terminal", "jvmRuntimeElements"))
+    implementation(project(":text-adventure-engine-common","jvmRuntimeElements"))
+    implementation(project(":my-game-common", "jvmRuntimeElements"))
+    implementation("io.github.microutils:kotlin-logging:1.6.23")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     listOf("slf4j-api", "slf4j-log4j12").forEach {
         implementation(group = "org.slf4j", name = it, version = "1.7.25")

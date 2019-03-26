@@ -1,43 +1,40 @@
 package com.github.wakingrufus.mygame
 
-
-import com.github.wakingrufus.adventure.DECISION
+import com.github.wakingrufus.adventure.game
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
-class MyGameTest {
+class SampleGameTest {
+
     @Test
     fun `test main menu`() {
-        val outputCollector = StringBuilder()
-        val startingState = MyState()
-        val actualState = DECISION<MyState>()
-                .apply(mainMenu<MyState>())
-                .decide(startingState, { "3" }, { outputCollector.append(it + "\n") })
-        assertEquals(expected = """Main Menu
-            |1) Continue Story
-            |2) Status
-            |3) Quit
-            |
-        """.trimMargin(),
-                actual = outputCollector.toString())
-        assertEquals(expected = startingState, actual = actualState)
+        val actualState = game<MyState> {
+            start(mainMenu())
+        }()
+
+        assertEquals(expected = "Main Menu", actual = actualState.mainDecision.prompt)
     }
 
     @Test
     fun `test main menu status`() {
-        val outputCollector = StringBuilder()
-        val startingState = MyState()
-        val actualState = DECISION<MyState>()
-                .apply(mainMenu<MyState>())
-                .decide(startingState, { "2" }, { outputCollector.append(it + "\n") })
-        assertEquals(expected = """Main Menu
-            |1) Continue Story
-            |2) Status
-            |3) Quit
-            |$actualState
-            |
-        """.trimMargin(),
-                actual = outputCollector.toString())
-        assertEquals(expected = startingState, actual = actualState)
+        val actualState = game<MyState> {
+            start(mainMenu())
+        }.invoke()
+        val inputState = MyState()
+
+        val statusChoice = actualState.mainDecision.selectChoice("3")
+        assertNotNull(statusChoice)
+        assertEquals(expected = "10 / 10", actual = statusChoice.info?.invoke(inputState))
+
+    }
+
+    @Test
+    fun `test wakeUp`() {
+        val actualState = game<MyState> {
+            start(wakeUp())
+        }()
+
+        assertEquals(expected = "You wake up", actual = actualState.mainDecision.prompt)
     }
 }
