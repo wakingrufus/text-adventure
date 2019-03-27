@@ -37,4 +37,17 @@ class SampleGameTest {
 
         assertEquals(expected = "You wake up", actual = actualState.mainDecision.prompt)
     }
+
+    @Test
+    fun `test continue`() {
+        val actualState = game<MyState> {
+            start(mainMenu())
+        }.invoke()
+        val inputState = MyState(checkpoint = "2")
+
+        val statusChoice = actualState.mainDecision.selectChoice("2")
+        assertNotNull(statusChoice)
+        val gotoTarget = statusChoice.decision(inputState)
+        assertEquals(expected = "Main Menu", actual = gotoTarget?.prompt)
+    }
 }

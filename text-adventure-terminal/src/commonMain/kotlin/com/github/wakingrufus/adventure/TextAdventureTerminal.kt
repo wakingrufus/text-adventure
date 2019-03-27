@@ -15,25 +15,16 @@ fun <T> Game<T>.play(state: T, input: () -> String?, output: (String) -> Unit): 
         choices.forEachIndexed { i, choiceText ->
             output("${i + 1}) ${choiceText.description}")
         }
-    //    var selectedChoice: Choice<T>? = null
-     //   while (selectedChoice == null) {
-            val choiceInput = input()
-            choiceInput?.also {
-                 currentDecision?.selectChoice(it)?.apply{
-                    info?.run {
-                        output(this(state))
-                    }
-                    currentDecision = decision(state)
-                    newState = stateChange(state)
+        val choiceInput = input()
+        choiceInput?.also {
+            currentDecision?.selectChoice(it)?.apply {
+                info?.run {
+                    output(this(newState))
                 }
+                newState = stateChange(newState)
+                currentDecision = decision(newState)
             }
-  //      }
-
-//        selectedChoice.info?.run {
-//            output(this(state))
-//        }
-//        currentDecision = selectedChoice.decision(state)
-//        newState = selectedChoice.stateChange(state)
+        }
     }
     return newState
 }

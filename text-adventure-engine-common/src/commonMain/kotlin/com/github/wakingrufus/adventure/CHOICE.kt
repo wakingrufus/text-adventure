@@ -18,8 +18,12 @@ class CHOICE<T> {
         info = text
     }
 
-    fun goto(gotoDecision: (T) -> DECISION<T>?) {
-        decision = gotoDecision
+    fun goto(gotoDecision: (T) -> DECISION<T>.() -> Unit) {
+        decision = {DECISION<T>().apply(gotoDecision(it))}
+    }
+
+    fun gotoMap(map: Map<String, DECISION<T>.() -> Unit>, selector: (T)-> String?){
+        goto {selector(it)?.let { map[it] } ?: map.values.first()}
     }
 
     private var stateChange: ((T) -> T) = { it }
